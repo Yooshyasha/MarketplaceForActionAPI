@@ -4,14 +4,10 @@ import com.yooshyasha.marketplaceforaction.entities.User
 import com.yooshyasha.marketplaceforaction.exceptions.UsernameOrPasswordInvalid
 import com.yooshyasha.marketplaceforaction.security.JwtTokenProvider
 import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import java.nio.charset.StandardCharsets
-import java.security.Key
 
 @Service
 class AuthService(
@@ -20,11 +16,12 @@ class AuthService(
     @Value("\${auth-configuration.secretKey}") private val secretKey: String,
     private val passwordEncoder: BCryptPasswordEncoder,
 ) {
+
     fun generateToken(user: User): String {
         return jwtTokenProvider.createJwt(user.userName, secretKey, user.roles)
     }
 
-    fun validateToken(token: String): Claims {
+    fun parseJwt(token: String): Claims {
         return jwtTokenProvider.parseJwt(token, secretKey)
     }
 
@@ -39,14 +36,7 @@ class AuthService(
     }
 
     private fun getUsernameFromToken(token: String): String {
-        val key: Key = Keys.hmacShaKeyFor(secretKey.toByteArray(StandardCharsets.UTF_8))
-
-        return Jwts.parser()
-            .setSigningKey(key)
-            .build()
-            .parseClaimsJws(token)
-            .body
-            .subject
+        return parseJwt(token).subject
     }
 
     fun getUserFromToken(token: String): User {

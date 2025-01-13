@@ -1,7 +1,6 @@
 package com.yooshyasha.marketplaceforaction.security
 
 import com.yooshyasha.marketplaceforaction.services.UserService
-import io.jsonwebtoken.Jwts
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -15,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthorizationFilter(
-    @Value("auth-configuration.secretKey") private val secretKey: String,
+    @Value("\${auth-configuration.secretKey}") private val secretKey: String,
     private val jwtTokenProvider: JwtTokenProvider,
     private val userService: UserService,
 ) : OncePerRequestFilter() {
@@ -60,11 +59,6 @@ class JwtAuthorizationFilter(
     }
 
     private fun getUsernameFromToken(token: String): String {
-        return Jwts.parser()
-            .setSigningKey(secretKey)
-            .build()
-            .parseClaimsJws(token)
-            .body
-            .subject
+        return jwtTokenProvider.parseJwt(token, secretKey).subject
     }
 }
