@@ -18,7 +18,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/users/**").permitAll()
+                it.requestMatchers("/users/**").authenticated()
                     .requestMatchers("/users/getAllUsers").not().authenticated()
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     .requestMatchers("/moderator/**").hasRole("MODERATOR")
