@@ -29,7 +29,7 @@ class AuthController(
         } catch (ex: Exception) {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .build()
+                .body(mapOf("message" to ex.message))
         }
     }
 
@@ -41,9 +41,13 @@ class AuthController(
 
             return ResponseEntity.ok(ResponseLoginDTO(token, user))
         } catch (ex: UsernameOrPasswordInvalid) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.message)
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(mapOf("message" to ex.message))
         } catch (ex: Exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message)
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(mapOf("message" to ex.message))
         }
     }
 

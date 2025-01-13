@@ -29,6 +29,8 @@ class JwtAuthorizationFilter(
         if (token != null && validateToken(token, secretKey)) {
             val authenticate = getAuthentication(token)
             SecurityContextHolder.getContext().authentication = authenticate
+        } else {
+            logger.debug("Token \"$token\" is null or invalid")
         }
 
         filterChain.doFilter(request, response)
