@@ -1,5 +1,6 @@
 package com.yooshyasha.marketplaceforaction.controller
 
+import com.yooshyasha.marketplaceforaction.dto.UserDTO
 import com.yooshyasha.marketplaceforaction.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +18,9 @@ class UserController(
     @GetMapping("/getAllUsers")
     fun getAllUsers(): ResponseEntity<Any> {
         return try {
-            ResponseEntity.ok(userService.getAllUsers())
+            ResponseEntity.ok(userService.getAllUsers().stream().map { user ->
+                UserDTO(user)
+            })
         } catch (e: Exception) {
             ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -33,7 +36,11 @@ class UserController(
             val userDetails = authentication.principal as UserDetails
             val user = userService.getUserByUsername(userDetails.username)
 
-            return ResponseEntity.ok(user)
+            if (user != null) {
+                return ResponseEntity.ok(UserDTO(user = user))
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         } catch (ex: Exception) {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
